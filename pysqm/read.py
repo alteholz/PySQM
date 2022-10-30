@@ -468,9 +468,10 @@ class SQMLE(SQM):
         except:
             print('Trying auto device address ...')
             self.addr = self.search()
-            print(('Found address %s ... ' %str(self.addr)))
-            self.port = 10001
-            self.start_connection()
+            if self.addr!=None:
+               print(('Found address %s ... ' %str(self.addr)))
+               self.port = 10001
+               self.start_connection()
 
         # Clearing buffer
         print(('Clearing buffer ... |'), end=' ')
@@ -667,26 +668,32 @@ class SQMLU(SQM):
             print(('Trying fixed device address %s ... ' %str(config._device_addr)))
             self.addr = config._device_addr
             self.bauds = 115200
-            self.start_connection()
+            try:
+                self.start_connection()
+            except OSError:
+                print('device ', config._device_addr, ' does not exist')
+                raise
         except:
             print('Trying auto device address ...')
             self.addr = self.search()
-            print(('Found address %s ... ' %str(self.addr)))
+            if self.addr != None: 
+                print(('Found address %s ... ' %str(self.addr)))
+
+        if self.addr != None: 
             self.bauds = 115200
             self.start_connection()
-
-        # Clearing buffer
-        print(('Clearing buffer ... |'), end=' ')
-        buffer_data = self.read_buffer()
-        print((buffer_data), end=' ')
-        print('| ... DONE')
-        print('Reading test data (ix,cx,rx)...')
-        time.sleep(1)
-        self.ix_readout = self.read_metadata(tries=10)
-        time.sleep(1)
-        self.cx_readout = self.read_calibration(tries=10)
-        time.sleep(1)
-        self.rx_readout = self.read_data(tries=10)
+            # Clearing buffer
+            print(('Clearing buffer ... |'), end=' ')
+            buffer_data = self.read_buffer()
+            print((buffer_data), end=' ')
+            print('| ... DONE')
+            print('Reading test data (ix,cx,rx)...')
+            time.sleep(1)
+            self.ix_readout = self.read_metadata(tries=10)
+            time.sleep(1)
+            self.cx_readout = self.read_calibration(tries=10)
+            time.sleep(1)
+            self.rx_readout = self.read_data(tries=10)
 
 
     def search(self):
@@ -700,27 +707,35 @@ class SQMLU(SQM):
         os_in_use = sys.platform
 
         if os_in_use == 'linux2':
+            print('Detected Linux2 platform')
+            ports = ports_unix
+        elif os_in_use == 'linux':
             print('Detected Linux platform')
             ports = ports_unix
         elif os_in_use == 'win32':
             print('Detected Windows platform')
             ports = ports_win
+        else:
+            print('No supported platform detected -> ', os_in_use)
 
         used_port = None
         for port in ports:
+            try:
+                os.stat(port)
+            except OSError:
+                print('port ', port,' does not exist')
+                continue
+
             conn_test = serial.Serial(port, 115200, timeout=1)
             conn_test.write('ix'.encode)
             if conn_test.readline()[0] == 'i':
                 used_port = port
                 break
 
-        try:
-            assert(used_port!=None)
-        except:
+        if (used_port==None):
             print('ERR. Device not found!')
-            raise
-        else:
-            return(used_port)
+
+        return(used_port)
 
     def start_connection(self):
         '''Start photometer connection '''

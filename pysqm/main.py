@@ -95,6 +95,9 @@ else:
     print(('ERROR. Unknown device type '+str(config._device_type)))
     exit(0)
 
+if mydevice.addr == None:
+   print('ERROR: no device found for reading data')
+   exit(1)
 
 def loop():
     '''

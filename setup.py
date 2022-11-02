@@ -23,5 +23,5 @@ setup(name='pysqm',
                    "Operating System :: OS Independent",
                    "Topic :: Scientific/Engineering :: Astronomy",
                    ],
-      long_description=open('README.txt').read()
+      long_description=open('README.txt', encoding="utf-8").read()
       )

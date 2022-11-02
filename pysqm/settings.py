@@ -23,28 +23,35 @@ along with PySQM.  If not, see <http://www.gnu.org/licenses/>.
 ____________________________
 '''
 
-import os,sys
+import os
+import sys
 
 
 class ArgParser:
+    '''parse arguments of program'''
+
     def __init__(self,inputfile=False):
         self.parse_arguments(inputfile)
 
     def parse_arguments(self,inputfile):
+        '''"do all the parsing work'''
         import argparse
         # Return config filename
         self.parser = argparse.ArgumentParser()
         self.parser.add_argument('-c', '--config', default="config.py")
-        if (inputfile):
+        if inputfile:
             self.parser.add_argument('-i', '--input', default=None)
         args = self.parser.parse_args()
         vars(self).update(args.__dict__)
 
     def print_help(self):
+        '''print help defined by argparse'''
         self.parser.print_help()
 
 
 class ConfigFile:
+    '''read config file'''
+
     def __init__(self, path="config.py"):
         # Guess the selected dir and config filename
         # Should accept:
@@ -57,6 +64,7 @@ class ConfigFile:
         self.config = None
 
     def read_config_file(self,path):
+        '''do all the work for reading the config file'''
         # Get the absolute path
         abspath = os.path.abspath(path)
         # Is a dir? Then add config.py (default filename)

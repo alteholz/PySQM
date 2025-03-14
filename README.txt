@@ -1,3 +1,13 @@
+
+
+This repository has been moved to codeberg and is now available at
+
+    https://codeberg.org/alteholz/PySQM.git
+
+
+
+
+
 PySQM
 =====
 
